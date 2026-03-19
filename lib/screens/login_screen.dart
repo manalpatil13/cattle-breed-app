@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
-import '../core/localization/app_localizations.dart';
+import '../utils/app_strings.dart';
 import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -11,118 +11,166 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final AuthService _authService = AuthService();
+  final _authService = AuthService();
 
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _villageController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _villageController = TextEditingController();
+  final _phoneController = TextEditingController();
 
-  bool _isLoading = false;
+  bool _loading = false;
 
-  Future<void> _continue() async {
-    setState(() => _isLoading = true);
-
-    final name = _nameController.text.trim();
-    final village = _villageController.text.trim();
-    final phone = _phoneController.text.trim();
-
-    try {
-      final farmer = await _authService.findFarmer(
-        name: name,
-        village: village,
-        phone: phone,
-      );
-
-      if (farmer == null) {
-        await _authService.createFarmer(
-          name: name,
-          village: village,
-          phone: phone,
-        );
-      }
-
-      await _authService.saveFarmerLocally(
-        name: name,
-        village: village,
-        phone: phone,
-      );
-
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const HomeScreen(),
-          ),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error: $e"),
-          backgroundColor: Colors.red,
-        ),
-      );
+  Future<void> _login() async {
+    if (_nameController.text.isEmpty ||
+        _villageController.text.isEmpty ||
+        _phoneController.text.isEmpty) {
+      return;
     }
 
-    setState(() => _isLoading = false);
+    setState(() => _loading = true);
+
+    await _authService.loginFarmer(
+      _nameController.text,
+      _villageController.text,
+      _phoneController.text,
+    );
+
+    setState(() => _loading = false);
+
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context);
-
     return Scaffold(
-      appBar: AppBar(
-        title: Text(loc.login),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.green.shade200,
+              Colors.green.shade50,
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
 
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: loc.get('name'),
-                border: const OutlineInputBorder(),
-              ),
-            ),
+                const SizedBox(height: 20),
 
-            const SizedBox(height: 20),
-
-            TextField(
-              controller: _villageController,
-              decoration: InputDecoration(
-                labelText: loc.get('village'),
-                border: const OutlineInputBorder(),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            TextField(
-              controller: _phoneController,
-              keyboardType: TextInputType.phone,
-              decoration: InputDecoration(
-                labelText: loc.get('phone'),
-                border: const OutlineInputBorder(),
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            _isLoading
-                ? const CircularProgressIndicator()
-                : ElevatedButton(
-                    onPressed: _continue,
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 50),
-                    ),
-                    child: Text(loc.get('continue')),
+                /// TITLE
+                Text(
+                  AppStrings.login(context),
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
                   ),
-          ],
+                ),
+
+                const SizedBox(height: 10),
+
+                const Text(
+                  "Enter your details to continue",
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 16,
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                /// INPUT CARD
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+
+                      _buildField(
+                        controller: _nameController,
+                        label: "Name",
+                        icon: Icons.person,
+                      ),
+
+                      const SizedBox(height: 15),
+
+                      _buildField(
+                        controller: _villageController,
+                        label: "Village",
+                        icon: Icons.location_on,
+                      ),
+
+                      const SizedBox(height: 15),
+
+                      _buildField(
+                        controller: _phoneController,
+                        label: "Phone",
+                        icon: Icons.phone,
+                        keyboard: TextInputType.phone,
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                /// BUTTON
+                ElevatedButton(
+                  onPressed: _login,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.shade700,
+                    minimumSize: const Size(double.infinity, 55),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: _loading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Text(
+                          AppStrings.login(context),
+                          style: const TextStyle(fontSize: 18),
+                        ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    TextInputType keyboard = TextInputType.text,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboard,
+      decoration: InputDecoration(
+        prefixIcon: Icon(icon),
+        labelText: label,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
     );

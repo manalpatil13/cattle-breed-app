@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import '../services/local_storage_service.dart';
-import '../models/prediction_model.dart';
-import 'history_detail_screen.dart';
+import '../services/history_service.dart';
+import 'result_screen.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -11,46 +10,44 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  final LocalStorageService _storageService = LocalStorageService();
-  List<PredictionModel> _history = [];
+  List<Map<String, dynamic>> history = [];
 
   @override
   void initState() {
     super.initState();
-    _loadHistory();
+    loadHistory();
   }
 
-  Future<void> _loadHistory() async {
-    final data = await _storageService.getPredictions();
+  Future<void> loadHistory() async {
+    final data = await HistoryService().getHistory();
     setState(() {
-      _history = data.reversed.toList();
+      history = data;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Prediction History"),
-        centerTitle: true,
-      ),
-      body: _history.isEmpty
-          ? const Center(child: Text("No History Yet"))
+      appBar: AppBar(title: const Text("History")),
+      body: history.isEmpty
+          ? const Center(child: Text("No history yet"))
           : ListView.builder(
-              itemCount: _history.length,
+              itemCount: history.length,
               itemBuilder: (context, index) {
-                final item = _history[index];
+                final item = history[index];
 
                 return Card(
+                  margin: const EdgeInsets.all(10),
                   child: ListTile(
-                    title: Text(item.breedName),
-                    subtitle: Text(item.dateTime),
+                    leading: const Icon(Icons.pets),
+                    title: Text(item['breed']),
+                    subtitle: Text(item['date']),
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (_) =>
-                              HistoryDetailScreen(prediction: item),
+                              ResultScreen(breedName: item['breed']),
                         ),
                       );
                     },

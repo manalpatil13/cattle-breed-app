@@ -1,7 +1,12 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+
 import '../services/auth_service.dart';
+import '../services/ai_service.dart';
+import '../services/history_service.dart';
+import '../utils/app_strings.dart';
+
 import 'language_screen.dart';
 import 'result_screen.dart';
 import 'history_screen.dart';
@@ -15,9 +20,26 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final AuthService _authService = AuthService();
+  final AIService _aiService = AIService();
   final ImagePicker _picker = ImagePicker();
 
   File? _selectedImage;
+
+  bool _loading = false;
+  bool _modelLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadModel();
+  }
+
+  Future<void> _loadModel() async {
+    await _aiService.loadModel();
+    setState(() {
+      _modelLoaded = true;
+    });
+  }
 
   Future<void> _pickImage(ImageSource source) async {
     final picked = await _picker.pickImage(source: source);
@@ -29,21 +51,49 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _predict() {
-    if (_selectedImage == null) return;
+  Future<void> _predict() async {
+    if (!_modelLoaded) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Model is still loading...")),
+      );
+      return;
+    }
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const ResultScreen(
-          breedName: "Gir Cow",
+    if (_selectedImage == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select an image")),
+      );
+      return;
+    }
+
+    try {
+      setState(() => _loading = true);
+
+      final result = await _aiService.predict(_selectedImage!);
+
+      setState(() => _loading = false);
+
+      /// 🔥 SAVE HISTORY
+      await HistoryService().savePrediction(result);
+
+      if (!mounted) return;
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ResultScreen(breedName: result),
         ),
-      ),
-    );
+      );
 
-    setState(() {
-      _selectedImage = null;
-    });
+      setState(() => _selectedImage = null);
+
+    } catch (e) {
+      setState(() => _loading = false);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    }
   }
 
   @override
@@ -99,9 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => LanguageScreen(
-                                onLanguageSelected: (locale) {},
-                              ),
+                              builder: (_) => const LanguageScreen(),
                             ),
                             (route) => false,
                           );
@@ -112,63 +160,39 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
+              if (!_modelLoaded)
+                const Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Text(
+                    "Loading AI Model...",
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+
               const SizedBox(height: 10),
 
-              /// WELCOME TEXT
-              const Text(
-                "Welcome Farmer 👨‍🌾",
-                style: TextStyle(
+              Text(
+                AppStrings.welcome(context),
+                style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
 
-              const SizedBox(height: 6),
-
-              const Text(
-                "Select cattle image for breed prediction",
-                style: TextStyle(
-                  fontSize: 15,
-                  color: Colors.black54,
-                ),
-              ),
-
               const SizedBox(height: 20),
 
-              /// IMAGE CARD
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 400),
-                    child: ClipRRect(
-                      key: ValueKey(_selectedImage?.path ?? "empty"),
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 10,
-                              spreadRadius: 2,
-                            ),
-                          ],
-                        ),
-                        child: _selectedImage == null
-                            ? Center(
-                                child: Icon(
-                                  Icons.camera_alt,
-                                  size: 90,
-                                  color: Colors.grey.shade400,
-                                ),
-                              )
-                            : Image.file(
-                                _selectedImage!,
-                                fit: BoxFit.cover,
-                              ),
-                      ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      width: double.infinity,
+                      color: Colors.white,
+                      child: _selectedImage == null
+                          ? Icon(Icons.camera_alt,
+                              size: 80, color: Colors.grey.shade400)
+                          : Image.file(_selectedImage!, fit: BoxFit.cover),
                     ),
                   ),
                 ),
@@ -176,7 +200,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
               const SizedBox(height: 20),
 
-              /// BUTTONS
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
@@ -185,30 +208,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: () => _pickImage(ImageSource.camera),
-                        icon: const Icon(Icons.camera_alt),
-                        label: const Text("Camera"),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
+                        icon: const Icon(Icons.camera),
+                        label: Text(AppStrings.camera(context)),
                       ),
                     ),
 
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
 
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: () => _pickImage(ImageSource.gallery),
                         icon: const Icon(Icons.photo),
-                        label: const Text("Gallery"),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
+                        label: Text(AppStrings.gallery(context)),
                       ),
                     ),
                   ],
@@ -223,16 +234,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: _predict,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green.shade700,
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size(double.infinity, 55),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
+                    minimumSize: const Size(double.infinity, 50),
                   ),
-                  child: const Text(
-                    "Predict Breed",
-                    style: TextStyle(fontSize: 18),
-                  ),
+                  child: _loading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Text(AppStrings.predict(context)),
                 ),
               ),
 

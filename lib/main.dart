@@ -1,90 +1,82 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'core/localization/app_localizations.dart';
+import 'providers/language_provider.dart';
 import 'screens/language_screen.dart';
 import 'screens/home_screen.dart';
 import 'services/auth_service.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  /// 🔥 SUPABASE INIT (REQUIRED)
   await Supabase.initialize(
     url: 'https://thcgtuskzvlzmefduxva.supabase.co',
     anonKey: 'sb_publishable_z4hyvIDZHWBcMiGS5XYkVg_BrjYTNbQ',
   );
 
-  runApp(const CattleApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => LanguageProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
-class CattleApp extends StatefulWidget {
-  const CattleApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
-  @override
-  State<CattleApp> createState() => _CattleAppState();
-}
+  Future<Widget> _getStartScreen() async {
+    final authService = AuthService();
+    final isLoggedIn = await authService.isLoggedIn();
 
-class _CattleAppState extends State<CattleApp> {
-  Locale _locale = const Locale('en');
-  final AuthService _authService = AuthService();
-  bool _checkedLogin = false;
-  bool _isLoggedIn = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkLogin();
-  }
-
-  Future<void> _checkLogin() async {
-    final loggedIn = await _authService.isFarmerLoggedIn();
-    setState(() {
-      _isLoggedIn = loggedIn;
-      _checkedLogin = true;
-    });
-  }
-
-  void changeLanguage(Locale locale) {
-    setState(() {
-      _locale = locale;
-    });
+    if (isLoggedIn) {
+      return const HomeScreen();
+    } else {
+      return const LanguageScreen();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!_checkedLogin) {
-      return const MaterialApp(
-        home: Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        ),
-      );
-    }
+    final languageProvider = Provider.of<LanguageProvider>(context);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      locale: _locale,
+      locale: languageProvider.locale,
+
       supportedLocales: const [
         Locale('en'),
         Locale('hi'),
-        Locale('gu'),
         Locale('mr'),
-        Locale('kn'),
         Locale('ta'),
         Locale('te'),
-        Locale('bn'),
+        Locale('kn'),
+        Locale('gu'),
         Locale('pa'),
-        Locale('or'),
       ],
+
       localizationsDelegates: const [
-        AppLocalizationsDelegate(),
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      home: _isLoggedIn
-          ? const HomeScreen()
-          : LanguageScreen(onLanguageSelected: changeLanguage),
+
+      /// 🔥 AUTO LOGIN
+      home: FutureBuilder<Widget>(
+        future: _getStartScreen(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          } else {
+            return snapshot.data!;
+          }
+        },
+      ),
     );
   }
 }
