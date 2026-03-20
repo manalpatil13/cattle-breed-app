@@ -14,19 +14,29 @@ dependencies:
 
   cupertino_icons: ^1.0.2
 
+  # 🌐 Internet API
+  http: ^1.2.1
+
+  # 🌍 Localization
   flutter_localizations:
     sdk: flutter
   intl: ^0.20.2
 
-  provider: ^6.1.2
-
-  supabase_flutter: ^2.3.4
-  shared_preferences: ^2.2.2
-  image_picker: ^1.0.7
-  path_provider: ^2.1.2
-
+  # 🧠 AI Model (FIXED VERSION)
   tflite_flutter: ^0.11.0
   image: ^4.1.7
+
+  # 📸 Image Picker
+  image_picker: ^1.0.7
+
+  # 💾 Local Storage (history)
+  shared_preferences: ^2.2.2
+
+  # ☁️ Supabase (login)
+  supabase_flutter: ^2.3.4
+
+  # 🧠 State Management (FIXED ERROR)
+  provider: ^6.0.5
 
 dev_dependencies:
   flutter_test:
@@ -38,5 +48,5 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/model/model.tflite
-    - assets/model/labels.txt
+    - assets/model/
+    - assets/labels/

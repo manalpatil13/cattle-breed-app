@@ -1,11 +1,11 @@
-Gir
-Sahiwal
-Red_Sindhi
-Tharparkar
-Ongole
-Kankrej
-Rathi
-Deoni
-Dangi
-Aryshire
+Gir cow
+Sahiwal cow
+Red_Sindhi cow
+Tharparkar cow
+Ongole cow
+Kankrej cow
+Rathi cow
+Deoni cow
+Dangi cow
+Aryshire cow
 not cattle

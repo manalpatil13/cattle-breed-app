@@ -1,100 +1,91 @@
 import 'package:flutter/material.dart';
+import '../services/breed_info_service.dart';
 
-class ResultScreen extends StatelessWidget {
+class ResultScreen extends StatefulWidget {
   final String breedName;
 
   const ResultScreen({super.key, required this.breedName});
 
   @override
+  State<ResultScreen> createState() => _ResultScreenState();
+}
+
+class _ResultScreenState extends State<ResultScreen> {
+  Map<String, String>? data;
+  bool loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    print("RESULT SCREEN RECEIVED: ${widget.breedName}");
+
+    final result =
+        await BreedInfoService().getBreedInfo(widget.breedName);
+
+    setState(() {
+      data = result;
+      loading = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Prediction Result"),
+        title: const Text("Breed Information"),
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Colors.green.shade100,
-              Colors.green.shade50,
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
+      body: loading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
 
-              const SizedBox(height: 10),
-
-              /// BREED NAME
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.green.shade700,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  children: [
-                    const Text(
-                      "Detected Breed",
-                      style: TextStyle(
-                        color: Colors.white70,
-                      ),
+                  /// BREED CARD
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade700,
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      breedName,
-                      style: const TextStyle(
-                        fontSize: 26,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    child: Column(
+                      children: [
+                        const Text(
+                          "Detected Breed",
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          widget.breedName,
+                          style: const TextStyle(
+                            fontSize: 26,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  _card("Information", data?["feeding"] ?? "No data"),
+                ],
               ),
-
-              const SizedBox(height: 20),
-
-              /// FEEDING
-              _sectionCard(
-                title: "Feeding Tips",
-                content:
-                    "Provide balanced diet with green fodder, dry fodder, and mineral mix. Ensure clean drinking water always.",
-              ),
-
-              const SizedBox(height: 15),
-
-              /// BREEDING
-              _sectionCard(
-                title: "Breeding Tips",
-                content:
-                    "Maintain proper breeding intervals and consult a veterinarian for artificial insemination.",
-              ),
-
-              const SizedBox(height: 15),
-
-              /// CARE
-              _sectionCard(
-                title: "Care Tips",
-                content:
-                    "Keep cattle in clean shelters, vaccinate regularly, and monitor health daily.",
-              ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 
-  Widget _sectionCard({required String title, required String content}) {
+  Widget _card(String title, String content) {
     return Container(
-      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 15),
       padding: const EdgeInsets.all(16),
+      width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
@@ -105,26 +96,7 @@ class ResultScreen extends StatelessWidget {
           )
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          Text(
-            content,
-            style: const TextStyle(color: Colors.black87),
-          ),
-        ],
-      ),
+      child: Text(content),
     );
   }
 }
