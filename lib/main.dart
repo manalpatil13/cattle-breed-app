@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'config/env.dart';
 import 'core/localization/app_localizations.dart';
 import 'providers/language_provider.dart';
 import 'screens/language_screen.dart';
@@ -13,8 +14,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Supabase.initialize(
-    url: 'https://thcgtuskzvlzmefduxva.supabase.co',
-    anonKey: 'sb_publishable_z4hyvIDZHWBcMiGS5XYkVg_BrjYTNbQ',
+    url: Env.supabaseUrl,
+    anonKey: Env.supabaseAnonKey,
   );
 
   runApp(
@@ -58,7 +59,7 @@ class MyApp extends StatelessWidget {
       ],
 
       localizationsDelegates: const [
-        AppLocalizationsDelegate(), // ✅ now registered
+        AppLocalizationsDelegate(),
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,

@@ -23,3 +23,6 @@ ios/.symlinks/
 
 # Env / secrets
 .env
+
+\# Environment / secrets
+lib/config/env.dart
