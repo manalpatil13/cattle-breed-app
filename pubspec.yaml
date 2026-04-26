@@ -22,7 +22,11 @@ dependencies:
     sdk: flutter
   intl: ^0.20.2
 
+<<<<<<< HEAD
   # 🧠 AI Model
+=======
+  # 🧠 AI Model (FIXED VERSION)
+>>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e
   tflite_flutter: ^0.11.0
   image: ^4.1.7
 
@@ -35,7 +39,11 @@ dependencies:
   # ☁️ Supabase (login)
   supabase_flutter: ^2.3.4
 
+<<<<<<< HEAD
   # 🧠 State Management
+=======
+  # 🧠 State Management (FIXED ERROR)
+>>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e
   provider: ^6.0.5
 
 dev_dependencies:
@@ -48,4 +56,9 @@ flutter:
   uses-material-design: true
 
   assets:
+<<<<<<< HEAD
     - assets/model/
+=======
+    - assets/model/
+    - assets/labels/
+>>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e

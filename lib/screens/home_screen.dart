@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+<<<<<<< HEAD
 import 'package:provider/provider.dart';
 
 import '../providers/language_provider.dart';
@@ -8,6 +9,12 @@ import '../services/auth_service.dart';
 import '../services/ai_service.dart';
 import '../services/history_service.dart';
 import '../services/breed_info_service.dart';
+=======
+
+import '../services/auth_service.dart';
+import '../services/ai_service.dart';
+import '../services/history_service.dart';
+>>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e
 import '../utils/app_strings.dart';
 
 import 'language_screen.dart';
@@ -27,6 +34,10 @@ class _HomeScreenState extends State<HomeScreen> {
   final ImagePicker _picker = ImagePicker();
 
   File? _selectedImage;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e
   bool _loading = false;
   bool _modelLoaded = false;
 
@@ -45,6 +56,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _pickImage(ImageSource source) async {
     final picked = await _picker.pickImage(source: source);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e
     if (picked != null) {
       setState(() {
         _selectedImage = File(picked.path);
@@ -52,6 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+<<<<<<< HEAD
   /// Show a friendly dialog when image is not a cattle
   void _showNotCattleDialog(BuildContext context) {
     final locale =
@@ -173,6 +189,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+=======
+>>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e
   Future<void> _predict() async {
     if (!_modelLoaded) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -191,6 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       setState(() => _loading = true);
 
+<<<<<<< HEAD
       // Step 1: get breed name from AI model
       final breedName = await _aiService.predict(_selectedImage!);
 
@@ -234,6 +253,21 @@ class _HomeScreenState extends State<HomeScreen> {
             breedName: breedName,
             breedInfo: breedInfo,
           ),
+=======
+      final result = await _aiService.predict(_selectedImage!);
+
+      setState(() => _loading = false);
+
+      /// 🔥 SAVE HISTORY
+      await HistoryService().savePrediction(result);
+
+      if (!mounted) return;
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ResultScreen(breedName: result),
+>>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e
         ),
       );
 
@@ -241,6 +275,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
     } catch (e) {
       setState(() => _loading = false);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error: $e")),
       );

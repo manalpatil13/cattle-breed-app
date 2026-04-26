@@ -12,6 +12,7 @@ class HistoryDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+<<<<<<< HEAD
       backgroundColor: Colors.green.shade50,
       appBar: AppBar(
         backgroundColor: Colors.green.shade700,
@@ -89,10 +90,53 @@ class HistoryDetailScreen extends StatelessWidget {
 
             const SizedBox(height: 10),
           ],
+=======
+      appBar: AppBar(
+        title: Text(prediction.breedName),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+
+              Text(
+                "Date: ${prediction.dateTime}",
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+
+              const SizedBox(height: 20),
+
+              const Text(
+                "Feeding Pattern:",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              Text(prediction.feeding),
+
+              const SizedBox(height: 15),
+
+              const Text(
+                "Breeding Tips:",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              Text(prediction.breeding),
+
+              const SizedBox(height: 15),
+
+              const Text(
+                "Care Tips:",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              Text(prediction.care),
+            ],
+          ),
+>>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e
         ),
       ),
     );
   }
+<<<<<<< HEAD
 
   Widget _infoCard({
     required String title,
@@ -168,4 +212,6 @@ class HistoryDetailScreen extends StatelessWidget {
       ),
     );
   }
+=======
+>>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e
 }
