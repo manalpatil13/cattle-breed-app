@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
-=======
->>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e
 import '../services/breed_info_service.dart';
 
 class ResultScreen extends StatefulWidget {
   final String breedName;
-<<<<<<< HEAD
   final Map<String, String>? breedInfo;
 
   const ResultScreen({
@@ -16,10 +12,6 @@ class ResultScreen extends StatefulWidget {
     required this.breedName,
     this.breedInfo,
   });
-=======
-
-  const ResultScreen({super.key, required this.breedName});
->>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e
 
   @override
   State<ResultScreen> createState() => _ResultScreenState();
@@ -36,7 +28,6 @@ class _ResultScreenState extends State<ResultScreen> {
   }
 
   Future<void> fetchData() async {
-<<<<<<< HEAD
     if (widget.breedInfo != null) {
       setState(() {
         data = widget.breedInfo;
@@ -52,33 +43,17 @@ class _ResultScreenState extends State<ResultScreen> {
         loading = false;
       });
     }
-=======
-    print("RESULT SCREEN RECEIVED: ${widget.breedName}");
-
-    final result =
-        await BreedInfoService().getBreedInfo(widget.breedName);
-
-    setState(() {
-      data = result;
-      loading = false;
-    });
->>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-<<<<<<< HEAD
       backgroundColor: Colors.green.shade50,
       appBar: AppBar(
         backgroundColor: Colors.green.shade700,
         foregroundColor: Colors.white,
         title: const Text("Breed Information"),
         centerTitle: true,
-=======
-      appBar: AppBar(
-        title: const Text("Breed Information"),
->>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e
       ),
       body: loading
           ? const Center(child: CircularProgressIndicator())
@@ -87,11 +62,7 @@ class _ResultScreenState extends State<ResultScreen> {
               child: Column(
                 children: [
 
-<<<<<<< HEAD
                   /// BREED NAME CARD
-=======
-                  /// BREED CARD
->>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
@@ -103,22 +74,15 @@ class _ResultScreenState extends State<ResultScreen> {
                       children: [
                         const Text(
                           "Detected Breed",
-<<<<<<< HEAD
                           style: TextStyle(
                             color: Colors.white70,
                             fontSize: 14,
                           ),
-=======
-                          style: TextStyle(color: Colors.white70),
->>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e
                         ),
                         const SizedBox(height: 8),
                         Text(
                           widget.breedName,
-<<<<<<< HEAD
                           textAlign: TextAlign.center,
-=======
->>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e
                           style: const TextStyle(
                             fontSize: 26,
                             color: Colors.white,
@@ -131,7 +95,6 @@ class _ResultScreenState extends State<ResultScreen> {
 
                   const SizedBox(height: 20),
 
-<<<<<<< HEAD
                   /// FEEDING / DIET
                   _infoCard(
                     title: "Feeding / Diet",
@@ -165,16 +128,12 @@ class _ResultScreenState extends State<ResultScreen> {
                   ),
 
                   const SizedBox(height: 10),
-=======
-                  _card("Information", data?["feeding"] ?? "No data"),
->>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e
                 ],
               ),
             ),
     );
   }
 
-<<<<<<< HEAD
   Widget _infoCard({
     required String title,
     required String content,
@@ -247,24 +206,6 @@ class _ResultScreenState extends State<ResultScreen> {
           ),
         ],
       ),
-=======
-  Widget _card(String title, String content) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 15),
-      padding: const EdgeInsets.all(16),
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 8,
-          )
-        ],
-      ),
-      child: Text(content),
->>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e
     );
   }
 }

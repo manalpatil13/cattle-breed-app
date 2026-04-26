@@ -1,13 +1,9 @@
 import 'dart:convert';
-<<<<<<< HEAD
 import 'package:flutter/material.dart';
-=======
->>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e
 import 'package:http/http.dart' as http;
 
 class BreedInfoService {
 
-<<<<<<< HEAD
   /// Map Flutter locale to Google Translate language code
   String _getTranslateLang(Locale locale) {
     switch (locale.languageCode) {
@@ -200,29 +196,12 @@ class BreedInfoService {
             return text;
           }
         }
-=======
-  /// 🔥 STEP 1: Search Wikipedia
-  Future<String?> searchBreed(String breed) async {
-    final url = Uri.parse(
-        "https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=$breed cattle&format=json");
-
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-
-      final results = data['query']['search'];
-
-      if (results != null && results.isNotEmpty) {
-        return results[0]['title']; // best match
->>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e
       }
     }
 
     return null;
   }
 
-<<<<<<< HEAD
   /// Step 7: Translate text using free Google Translate API
   /// Uses the unofficial endpoint — no API key required
   Future<String> _translate(String text, String targetLang) async {
@@ -241,28 +220,12 @@ class BreedInfoService {
         '&dt=t'
         '&q=${Uri.encodeComponent(trimmed)}',
       );
-=======
-  /// 🔥 STEP 2: Get summary
-  Future<Map<String, String>> getBreedInfo(String breed) async {
-    try {
-      final title = await searchBreed(breed);
-
-      if (title == null) {
-        return _fallback();
-      }
-
-      print("🔍 Found Wikipedia page: $title");
-
-      final url = Uri.parse(
-          "https://en.wikipedia.org/api/rest_v1/page/summary/${Uri.encodeComponent(title)}");
->>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e
 
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
 
-<<<<<<< HEAD
         // Response is a nested array — extract all translated chunks
         final List<dynamic> chunks = data[0];
         final translated = chunks
@@ -402,32 +365,4 @@ class BreedInfoService {
         fallbacks[key]?['en'] ??
         'Information not available.';
   }
-=======
-        final extract = data['extract'];
-
-        if (extract != null && extract.toString().isNotEmpty) {
-          return {
-            "feeding": extract,
-            "breeding": extract,
-            "care": extract,
-          };
-        }
-      }
-
-      return _fallback();
-
-    } catch (e) {
-      print("❌ ERROR: $e");
-      return _fallback();
-    }
-  }
-
-  Map<String, String> _fallback() {
-    return {
-      "feeding": "No information available for this breed.",
-      "breeding": "No information available for this breed.",
-      "care": "No information available for this breed.",
-    };
-  }
->>>>>>> 21917f0651e5ead9e628e9b8bcf320b116806c9e
 }

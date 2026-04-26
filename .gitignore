@@ -1,22 +1,25 @@
 # Flutter/Dart
 .dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
 .packages
+.pub-cache/
 .pub/
 build/
+*.g.dart
+*.freezed.dart
 
 # Android
 android/.gradle/
-android/app/build/
+android/local.properties
+android/key.properties
 
 # iOS
 ios/Pods/
 ios/.symlinks/
-ios/Flutter/
 
-# Misc
-*.log
-*.tmp
-*.swp
-.DS_Store
-.idea/
+# VS Code
 .vscode/
+
+# Env / secrets
+.env
